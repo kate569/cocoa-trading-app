@@ -14,14 +14,14 @@ def load_locations(filepath="locations.json"):
 
 
 def fetch_historical_weather(lat, lon, start_date, end_date):
-    """Fetch historical precipitation and temperature from Open-Meteo Archive API."""
+    """Fetch historical weather data from Open-Meteo Archive API."""
     url = "https://archive-api.open-meteo.com/v1/archive"
     params = {
         "latitude": lat,
         "longitude": lon,
         "start_date": start_date.isoformat(),
         "end_date": end_date.isoformat(),
-        "daily": "precipitation_sum,temperature_2m_max"
+        "daily": "precipitation_sum,temperature_2m_max,wind_speed_10m_max,relative_humidity_2m_mean"
     }
     response = requests.get(url, params=params)
     response.raise_for_status()
@@ -95,6 +95,22 @@ def main():
         else:
             heat_status = "✅ Normal"
         
+        # Calculate wind and humidity statistics for Harmattan detection
+        wind_values = current_weather["daily"]["wind_speed_10m_max"]
+        humidity_values = current_weather["daily"]["relative_humidity_2m_mean"]
+        
+        valid_wind = [w for w in wind_values if w is not None]
+        valid_humidity = [h for h in humidity_values if h is not None]
+        
+        avg_wind_speed = statistics.mean(valid_wind) if valid_wind else 0
+        avg_humidity = statistics.mean(valid_humidity) if valid_humidity else 100
+        
+        # Harmattan check: 25 knots ≈ 46 km/h, low humidity < 40%
+        if avg_wind_speed > 46 and avg_humidity < 40:
+            harmattan_status = "🌪️ HARMATTAN ALERT"
+        else:
+            harmattan_status = "🍃 Wind Normal"
+        
         # Format location name nicely (replace underscores, title case)
         display_name = name.replace("_", " ").title()
         
@@ -107,6 +123,9 @@ def main():
         print(f"  Drought Status: {drought_status}")
         print(f"  Avg Max Temp: {avg_max_temp:.1f} °C")
         print(f"  Days > 32°C: {days_above_32}")
+        print(f"  Avg Wind Speed: {avg_wind_speed:.1f} km/h")
+        print(f"  Avg Humidity: {avg_humidity:.1f}%")
+        print(f"  Harmattan Status: {harmattan_status}")
         print()  # Blank line between locations
     
     # Dual-region drought check
