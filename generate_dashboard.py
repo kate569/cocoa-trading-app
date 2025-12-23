@@ -10,6 +10,7 @@ from fetch_enso import get_enso_signal
 from fetch_market import get_market_data
 from check_fundamentals import get_fundamentals_analysis
 from fetch_technicals import get_technical_analysis
+from market_narrative import generate_market_narrative
 
 
 def calculate_verdict(weather, enso, fundamentals):
@@ -75,6 +76,10 @@ def generate_html():
     verdict, verdict_class, description, multiplier, active_signals = calculate_verdict(
         weather, enso, fundamentals
     )
+    
+    # Generate market narrative
+    news_sentiment = fundamentals.get("news_sentiment", "NEUTRAL")
+    narrative = generate_market_narrative(tech_data, fundamentals, weather, news_sentiment)
     
     # Format market change
     if market["change_pct"] is not None:
@@ -378,6 +383,40 @@ def generate_html():
             line-height: 1.6;
         }}
         
+        .narrative-section {{
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: left;
+        }}
+        
+        .narrative-section h4 {{
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }}
+        
+        .narrative-text {{
+            color: #e0e0e0;
+            font-size: 0.95em;
+            line-height: 1.8;
+        }}
+        
+        .narrative-text .driver {{
+            color: #fff;
+            margin-bottom: 10px;
+        }}
+        
+        .narrative-text .chart {{
+            color: #ccc;
+            margin-bottom: 10px;
+        }}
+        
+        .narrative-text .context {{
+            color: #ff8800;
+        }}
+        
         .signals-container {{
             margin-top: 20px;
             display: flex;
@@ -509,17 +548,25 @@ def generate_html():
             <h2>{verdict}</h2>
             <div class="description">{description}</div>
             
+            <div class="narrative-section">
+                <h4>📝 MARKET ANALYSIS</h4>
+                <div class="narrative-text">
+                    <p class="driver">🎯 <strong>The Driver:</strong> {narrative['driver']}</p>
+                    <p class="chart">📊 <strong>The Chart:</strong> {narrative['chart']}</p>
+                    <p class="context">🌦️ <strong>The Context:</strong> {narrative['context']}</p>
+                </div>
+            </div>
+            
             <div class="strategy-section">
                 <div class="strategy-box">
                     <h4>🎯 STRATEGY (Fundamental)</h4>
                     <p>Risk Appetite: {verdict}<br>
-                    Position Size: {multiplier}x Standard Lots<br>
-                    Based on: Weather, Climate, Supply fundamentals</p>
+                    Position Size: {multiplier}x Standard Lots</p>
                 </div>
                 <div class="strategy-box">
                     <h4>⚡ TACTICS (Technical)</h4>
                     <p>Signal: {tech_data['signal']}<br>
-                    {tech_data['explanation']}</p>
+                    Trend: {tech_data['trend']} | RSI: {tech_data['rsi']:.0f}</p>
                 </div>
             </div>
             
