@@ -255,6 +255,27 @@
             color: #ff8800;
         }
         
+        .chart-section {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-section h3 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .chart-section img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        
         .signals-container {
             margin-top: 20px;
             display: flex;
@@ -292,20 +313,20 @@
         <header>
             <h1>🍫 COCOA INTELLIGENCE UNIT</h1>
             <div class="subtitle">Weather-Driven Commodity Trading System</div>
-            <div class="timestamp">Last Updated: 2025-12-23 13:09 UTC</div>
+            <div class="timestamp">Last Updated: 2025-12-23 13:13 UTC</div>
         </header>
         
         <div class="grid">
             <!-- Market Card -->
             <div class="card">
                 <h3>📊 MARKET</h3>
-                <div class="price">$5,857.00</div>
+                <div class="price">$5,848.00</div>
                 <div class="metric">
                     <span class="label">ICE Cocoa Futures (CC=F)</span>
                 </div>
                 <div class="metric">
                     <span class="label">Daily Change</span>
-                    <span class="negative">-0.51%</span>
+                    <span class="negative">-0.66%</span>
                 </div>
                 <div class="metric">
                     <span class="label">Previous Close</span>
@@ -319,11 +340,11 @@
                 <div class="tech-signal positive">BUY</div>
                 <div class="metric">
                     <span class="label">SMA (50)</span>
-                    <span>$5,796.94</span>
+                    <span>$5,796.76</span>
                 </div>
                 <div class="metric">
                     <span class="label">RSI (14)</span>
-                    <span class="neutral">62.4</span>
+                    <span class="neutral">62.0</span>
                 </div>
                 <div class="metric">
                     <span class="label">Trend</span>
@@ -435,6 +456,12 @@
         
                 
             </div>
+        </div>
+        
+        <!-- Price Chart Section -->
+        <div class="chart-section">
+            <h3>📊 ICE COCOA FUTURES - 6 MONTH CHART (with SMA-50)</h3>
+            <img src="docs/chart.png" alt="Cocoa Futures Chart with SMA-50" />
         </div>
         
         <!-- Verdict Banner -->

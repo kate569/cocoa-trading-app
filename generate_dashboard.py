@@ -11,6 +11,7 @@ from fetch_market import get_market_data
 from check_fundamentals import get_fundamentals_analysis
 from fetch_technicals import get_technical_analysis
 from market_narrative import generate_market_narrative
+from plot_chart import generate_chart
 
 
 def calculate_verdict(weather, enso, fundamentals):
@@ -64,6 +65,10 @@ def calculate_verdict(weather, enso, fundamentals):
 def generate_html():
     """Generate the HTML dashboard."""
     print("Fetching data from all sources...")
+    
+    # Generate price chart
+    print("Generating price chart...")
+    generate_chart("docs/chart.png")
     
     # Fetch all data
     weather = analyze_weather()
@@ -417,6 +422,27 @@ def generate_html():
             color: #ff8800;
         }}
         
+        .chart-section {{
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }}
+        
+        .chart-section h3 {{
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }}
+        
+        .chart-section img {{
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }}
+        
         .signals-container {{
             margin-top: 20px;
             display: flex;
@@ -541,6 +567,12 @@ def generate_html():
                 {weather_cards}
                 {'<div class="alert" style="text-align:center;padding:10px;margin-top:10px;">🚨 DUAL-REGION DROUGHT 🚨</div>' if weather['dual_region_drought_detected'] else ''}
             </div>
+        </div>
+        
+        <!-- Price Chart Section -->
+        <div class="chart-section">
+            <h3>📊 ICE COCOA FUTURES - 6 MONTH CHART (with SMA-50)</h3>
+            <img src="docs/chart.png" alt="Cocoa Futures Chart with SMA-50" />
         </div>
         
         <!-- Verdict Banner -->

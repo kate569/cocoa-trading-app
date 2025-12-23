@@ -33,6 +33,6 @@ jobs:
         run: |
           git config --global user.name 'CocoaBot'
           git config --global user.email 'bot@noreply.github.com'
-          git add index.html fundamentals.json
+          git add index.html fundamentals.json docs/chart.png
           git commit -m "Daily Dashboard Update: $(date)" || echo "No changes to commit"
           git push
