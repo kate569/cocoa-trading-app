@@ -23,6 +23,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Analyze News Sentiment
+        run: python fetch_news_sentiment.py
+
       - name: Generate Dashboard HTML
         run: python generate_dashboard.py
 
@@ -30,6 +33,6 @@ jobs:
         run: |
           git config --global user.name 'CocoaBot'
           git config --global user.email 'bot@noreply.github.com'
-          git add index.html
+          git add index.html fundamentals.json
           git commit -m "Daily Dashboard Update: $(date)" || echo "No changes to commit"
           git push

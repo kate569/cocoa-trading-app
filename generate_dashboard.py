@@ -93,6 +93,18 @@ def generate_html():
         tech_signal_class = "neutral"
         rsi_class = "neutral"
     
+    # Format news sentiment
+    news_sentiment = fundamentals.get("news_sentiment", "NEUTRAL")
+    if "DEFICIT" in news_sentiment or news_sentiment == "BULLISH":
+        news_sentiment_class = "negative"  # Red = supply concern = bullish for prices
+        news_sentiment_display = f"🔴 {news_sentiment}"
+    elif "SURPLUS" in news_sentiment or news_sentiment == "BEARISH":
+        news_sentiment_class = "positive"  # Green = supply comfort = bearish for prices
+        news_sentiment_display = f"🟢 {news_sentiment}"
+    else:
+        news_sentiment_class = "neutral"
+        news_sentiment_display = f"⚪ {news_sentiment}"
+    
     # Build weather cards HTML
     weather_cards = ""
     for region, data in weather["regions"].items():
@@ -456,6 +468,10 @@ def generate_html():
                 <div class="metric">
                     <span class="label">Status</span>
                     <span>{fundamentals['status_display']}</span>
+                </div>
+                <div class="metric">
+                    <span class="label">News Sentiment</span>
+                    <span class="{news_sentiment_class}">{news_sentiment_display}</span>
                 </div>
                 <div class="metric">
                     <span class="label">Position Multiplier</span>
