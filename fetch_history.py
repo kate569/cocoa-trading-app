@@ -68,6 +68,14 @@ def main():
         # Calculate Z-Score (Simplified SPI)
         z_score = (current_rainfall - average_rainfall) / std_deviation
         
+        # Determine drought status based on Z-Score
+        if z_score < -1.5:
+            drought_status = "🔴 SEVERE DROUGHT ALERT"
+        elif z_score < -1.0:
+            drought_status = "🟠 DRY WARNING"
+        else:
+            drought_status = "💧 Moisture OK"
+        
         # Fetch current period weather for temperature analysis
         current_weather = fetch_historical_weather(lat, lon, start_date_current, end_date_current)
         temp_max_values = current_weather["daily"]["temperature_2m_max"]
@@ -92,6 +100,7 @@ def main():
         print(f"  Current Deviation from Average: {deviation:.1f} mm")
         print(f"  Standard Deviation: {std_deviation:.1f}")
         print(f"  Z-Score (SPI proxy): {z_score:.2f}")
+        print(f"  Drought Status: {drought_status}")
         print(f"  Avg Max Temp: {avg_max_temp:.1f} °C")
         print(f"  Days > 32°C: {days_above_32}")
         print()  # Blank line between locations
