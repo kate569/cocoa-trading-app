@@ -14,14 +14,14 @@ def load_locations(filepath="locations.json"):
 
 
 def fetch_historical_weather(lat, lon, start_date, end_date):
-    """Fetch historical precipitation from Open-Meteo Archive API."""
+    """Fetch historical precipitation and temperature from Open-Meteo Archive API."""
     url = "https://archive-api.open-meteo.com/v1/archive"
     params = {
         "latitude": lat,
         "longitude": lon,
         "start_date": start_date.isoformat(),
         "end_date": end_date.isoformat(),
-        "daily": "precipitation_sum"
+        "daily": "precipitation_sum,temperature_2m_max"
     }
     response = requests.get(url, params=params)
     response.raise_for_status()
@@ -68,6 +68,15 @@ def main():
         # Calculate Z-Score (Simplified SPI)
         z_score = (current_rainfall - average_rainfall) / std_deviation
         
+        # Fetch current period weather for temperature analysis
+        current_weather = fetch_historical_weather(lat, lon, start_date_current, end_date_current)
+        temp_max_values = current_weather["daily"]["temperature_2m_max"]
+        
+        # Calculate temperature statistics (handling None values)
+        valid_temps = [t for t in temp_max_values if t is not None]
+        avg_max_temp = statistics.mean(valid_temps) if valid_temps else 0
+        days_above_32 = sum(1 for t in valid_temps if t > 32.0)
+        
         # Format location name nicely (replace underscores, title case)
         display_name = name.replace("_", " ").title()
         
@@ -77,6 +86,8 @@ def main():
         print(f"  Current Deviation from Average: {deviation:.1f} mm")
         print(f"  Standard Deviation: {std_deviation:.1f}")
         print(f"  Z-Score (SPI proxy): {z_score:.2f}")
+        print(f"  Avg Max Temp: {avg_max_temp:.1f} °C")
+        print(f"  Days > 32°C: {days_above_32}")
         print()  # Blank line between locations
 
 
