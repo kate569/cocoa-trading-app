@@ -20,19 +20,54 @@ def calculate_position_multiplier(stocks_ratio):
         return 1.0, "✅ STOCKS HEALTHY"
 
 
+def get_fundamental_multiplier():
+    """
+    Get the position size multiplier based on market fundamentals.
+    
+    Returns:
+        float: Position size multiplier (1.0, 2.0, or 2.5)
+    """
+    fundamentals = load_fundamentals()
+    stocks_ratio = fundamentals["global_stocks_to_usage_ratio"]
+    multiplier, _ = calculate_position_multiplier(stocks_ratio)
+    return multiplier
+
+
+def get_fundamentals_analysis():
+    """
+    Get full fundamentals analysis including ratio, multiplier, and status.
+    
+    Returns:
+        dict: {"stocks_ratio": float, "multiplier": float, "status": str, "status_display": str}
+    """
+    fundamentals = load_fundamentals()
+    stocks_ratio = fundamentals["global_stocks_to_usage_ratio"]
+    multiplier, status_display = calculate_position_multiplier(stocks_ratio)
+    
+    if multiplier == 2.5:
+        status = "CRITICAL_DEFICIT"
+    elif multiplier == 2.0:
+        status = "LOW_STOCKS"
+    else:
+        status = "HEALTHY"
+    
+    return {
+        "stocks_ratio": stocks_ratio,
+        "multiplier": multiplier,
+        "status": status,
+        "status_display": status_display
+    }
+
+
 def main():
     print("📊 Cocoa Market Fundamentals Check")
     print("-" * 40)
     
-    fundamentals = load_fundamentals()
-    stocks_ratio = fundamentals["global_stocks_to_usage_ratio"]
+    analysis = get_fundamentals_analysis()
     
-    print(f"Global Stocks-to-Usage Ratio: {stocks_ratio}%")
+    print(f"Global Stocks-to-Usage Ratio: {analysis['stocks_ratio']}%")
     print()
-    
-    multiplier, status = calculate_position_multiplier(stocks_ratio)
-    
-    print(f"{status}: Position Size Multiplier = {multiplier}x")
+    print(f"{analysis['status_display']}: Position Size Multiplier = {analysis['multiplier']}x")
 
 
 if __name__ == "__main__":

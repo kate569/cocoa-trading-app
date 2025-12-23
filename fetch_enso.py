@@ -57,24 +57,53 @@ def parse_oni_data(data_text):
 def interpret_oni(value):
     """Interpret ONI value according to trading strategy."""
     if value > 1.2:
-        return "🌊 EL NIÑO SIGNAL: STRONG BULLISH (Lead time 6-8 mo)"
+        return "BULLISH", "🌊 EL NIÑO SIGNAL: STRONG BULLISH (Lead time 6-8 mo)"
     elif value < -1.0:
-        return "❄️ LA NIÑA SIGNAL: Check Atlantic Temps"
+        return "BEARISH", "❄️ LA NIÑA SIGNAL: Check Atlantic Temps"
     else:
-        return "⚪ ENSO Neutral"
+        return "NEUTRAL", "⚪ ENSO Neutral"
+
+
+def get_enso_signal():
+    """
+    Get ENSO/ONI signal for trading strategy.
+    
+    Returns:
+        dict: {"value": float, "signal": "BULLISH/NEUTRAL/BEARISH", 
+               "month": str, "year": int, "display": str}
+    """
+    data_text = fetch_oni_data()
+    oni_value, year, month = parse_oni_data(data_text)
+    
+    if oni_value is not None:
+        signal, display = interpret_oni(oni_value)
+        return {
+            "value": oni_value,
+            "signal": signal,
+            "month": month,
+            "year": year,
+            "display": display
+        }
+    else:
+        return {
+            "value": None,
+            "signal": "UNKNOWN",
+            "month": None,
+            "year": None,
+            "display": "Error: Could not parse ONI data"
+        }
 
 
 def main():
     print("Fetching ENSO/ONI data from NOAA...\n")
     
-    data_text = fetch_oni_data()
-    oni_value, year, month = parse_oni_data(data_text)
+    result = get_enso_signal()
     
-    if oni_value is not None:
-        print(f"Latest ONI Value: {oni_value:.2f} ({month} {year})")
-        print(interpret_oni(oni_value))
+    if result["value"] is not None:
+        print(f"Latest ONI Value: {result['value']:.2f} ({result['month']} {result['year']})")
+        print(result["display"])
     else:
-        print("Error: Could not parse ONI data")
+        print(result["display"])
 
 
 if __name__ == "__main__":

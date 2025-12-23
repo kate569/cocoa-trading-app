@@ -26,20 +26,39 @@ def fetch_cocoa_futures():
     return current_price, previous_close
 
 
+def get_market_data():
+    """
+    Get current cocoa futures market data.
+    
+    Returns:
+        dict: {"price": float, "change_pct": float, "previous_close": float}
+    """
+    current_price, previous_close = fetch_cocoa_futures()
+    
+    change_pct = None
+    if current_price is not None and previous_close is not None and previous_close != 0:
+        change_pct = ((current_price - previous_close) / previous_close) * 100
+    
+    return {
+        "price": current_price,
+        "change_pct": change_pct,
+        "previous_close": previous_close
+    }
+
+
 def main():
     print("🍫 ICE Cocoa Futures (CC=F)")
     print("-" * 30)
     
-    current_price, previous_close = fetch_cocoa_futures()
+    data = get_market_data()
     
-    if current_price is not None:
-        print(f"Current Price: ${current_price:,.2f}")
+    if data["price"] is not None:
+        print(f"Current Price: ${data['price']:,.2f}")
         
-        if previous_close is not None and previous_close != 0:
-            daily_change = ((current_price - previous_close) / previous_close) * 100
-            change_symbol = "+" if daily_change >= 0 else ""
-            print(f"Previous Close: ${previous_close:,.2f}")
-            print(f"Daily Change: {change_symbol}{daily_change:.2f}%")
+        if data["change_pct"] is not None:
+            change_symbol = "+" if data["change_pct"] >= 0 else ""
+            print(f"Previous Close: ${data['previous_close']:,.2f}")
+            print(f"Daily Change: {change_symbol}{data['change_pct']:.2f}%")
         else:
             print("Daily Change: N/A")
     else:
