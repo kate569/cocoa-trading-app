@@ -239,84 +239,20 @@
             color: #e0e0e0;
             font-size: 0.95em;
             line-height: 1.8;
-            white-space: pre-wrap;
         }
         
-        .narrative-paragraph {
-            color: #ddd;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: #222;
-            border-radius: 5px;
-            border-left: 3px solid #00ff88;
-        }
-        
-        .holding-time-box {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-            border: 2px solid #00aaff;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        
-        .holding-time-box h4 {
-            color: #00aaff;
-            margin-bottom: 10px;
-        }
-        
-        .holding-time-box .duration {
-            font-size: 2em;
+        .narrative-text .driver {
             color: #fff;
-            font-weight: bold;
-        }
-        
-        .holding-time-box .exit-condition {
-            color: #888;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-        
-        .why-signal-box {
-            background: #1a1a1a;
-            border: 1px solid #ff8800;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: left;
-        }
-        
-        .why-signal-box h4 {
-            color: #ff8800;
-            margin-bottom: 15px;
-        }
-        
-        .why-signal-box .content {
-            color: #ccc;
-            font-size: 0.9em;
-            line-height: 1.7;
-            white-space: pre-wrap;
-        }
-        
-        .correlated-warning {
-            background: linear-gradient(135deg, #2a1a1a 0%, #3a2020 100%);
-            border: 2px solid #ff4444;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: left;
-        }
-        
-        .correlated-warning h4 {
-            color: #ff4444;
             margin-bottom: 10px;
         }
         
-        .correlated-warning .content {
-            color: #ffaaaa;
-            font-size: 0.9em;
-            line-height: 1.7;
-            white-space: pre-wrap;
+        .narrative-text .chart {
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+        
+        .narrative-text .context {
+            color: #ff8800;
         }
         
         .chart-section {
@@ -377,20 +313,20 @@
         <header>
             <h1>🍫 COCOA INTELLIGENCE UNIT</h1>
             <div class="subtitle">Weather-Driven Commodity Trading System</div>
-            <div class="timestamp">Last Updated: 2025-12-23 16:05 UTC</div>
+            <div class="timestamp">Last Updated: 2025-12-23 13:21 UTC</div>
         </header>
         
         <div class="grid">
             <!-- Market Card -->
             <div class="card">
                 <h3>📊 MARKET</h3>
-                <div class="price">$5,910.00</div>
+                <div class="price">$5,853.00</div>
                 <div class="metric">
                     <span class="label">ICE Cocoa Futures (CC=F)</span>
                 </div>
                 <div class="metric">
                     <span class="label">Daily Change</span>
-                    <span class="positive">+0.39%</span>
+                    <span class="negative">-0.58%</span>
                 </div>
                 <div class="metric">
                     <span class="label">Previous Close</span>
@@ -404,11 +340,11 @@
                 <div class="tech-signal positive">BUY</div>
                 <div class="metric">
                     <span class="label">SMA (50)</span>
-                    <span>$5,798.00</span>
+                    <span>$5,796.86</span>
                 </div>
                 <div class="metric">
                     <span class="label">RSI (14)</span>
-                    <span class="neutral">64.1</span>
+                    <span class="neutral">62.2</span>
                 </div>
                 <div class="metric">
                     <span class="label">Trend</span>
@@ -534,51 +470,13 @@
             <div class="description">Single bullish signal active</div>
             
             <div class="narrative-section">
-                <h4>📝 DETAILED MARKET ANALYSIS</h4>
+                <h4>📝 MARKET ANALYSIS</h4>
                 <div class="narrative-text">
-                    <div class="narrative-paragraph">
-                        🎯 <strong>Fundamental Backdrop:</strong><br>The cocoa market is in a state of structural deficit with global stocks-to-usage at just 29.5%. This represents one of the tightest supply situations in recent history, leaving the market exceptionally vulnerable to any supply disruption. With neutral news flow currently, the fundamental backdrop remains firmly supportive for prices.
-                    </div>
-                    <div class="narrative-paragraph">
-                        📊 <strong>Technical Positioning:</strong><br>Price at $5,910 trades above the 50-day SMA ($5,798), confirming the bullish trend structure. RSI at 64 shows healthy bullish momentum with room to run before reaching overbought territory.
-                    </div>
-                    <div class="narrative-paragraph">
-                        🌦️ <strong>Weather & Risk Context:</strong><br>Weather monitoring has identified stress conditions in: Kumasi (critical heat stress). These conditions may impact near-term supply and should be monitored closely for deterioration or improvement.
-                    </div>
+                    <p class="driver">🎯 <strong>The Driver:</strong> Market fundamentals indicate a critical supply deficit with mixed news sentiment, suggesting a strongly bullish supply-side outlook.</p>
+                    <p class="chart">📊 <strong>The Chart:</strong> Technically, the uptrend remains intact as price trades above the 50-day SMA, with RSI at 62 showing balanced momentum.</p>
+                    <p class="context">🌦️ <strong>The Context:</strong> ⚠️ Key Risk: Heat Stress Alert in Kumasi may significantly impact near-term supply.</p>
                 </div>
             </div>
-            
-            <!-- Holding Time Box -->
-            <div class="holding-time-box">
-                <h4>🕒 ESTIMATED HOLDING TIME</h4>
-                <div class="duration">8-10 months</div>
-                <div class="exit-condition">
-                    Exit before main crop harvest in October-December
-                </div>
-            </div>
-            
-            <!-- Why This Signal Box -->
-            <div class="why-signal-box">
-                <h4>💡 WHY THIS SIGNAL?</h4>
-                <div class="content">💡 WHY THIS SIGNAL?
-
-CRITICAL: Stocks-to-usage ratio at 29.5% represents a structural deficit:
-
-• Normal buffer zone: 35-45%
-• Current level: 29.5% (CRITICAL DEFICIT)
-• Amplification factor: 2.5x
-
-This is the LOWEST stocks level in recent history. The cocoa market is operating with virtually NO safety margin:
-
-1. ANY weather shock gets amplified 2.5x in price impact
-2. Buyers cannot source alternative supply - there is none
-3. Processor margins are already squeezed to breaking point
-4. The market is ONE bad harvest away from genuine crisis
-
-The 2.5x position multiplier reflects maximum conviction. Even minor weather concerns in this environment can trigger outsized price moves.</div>
-            </div>
-            
-            
             
             <div class="strategy-section">
                 <div class="strategy-box">
@@ -589,7 +487,7 @@ The 2.5x position multiplier reflects maximum conviction. Even minor weather con
                 <div class="strategy-box">
                     <h4>⚡ TACTICS (Technical)</h4>
                     <p>Signal: BUY<br>
-                    Trend: Uptrend | RSI: 64</p>
+                    Trend: Uptrend | RSI: 62</p>
                 </div>
             </div>
             
