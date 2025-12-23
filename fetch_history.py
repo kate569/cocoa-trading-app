@@ -2,6 +2,7 @@
 """Fetch historical weather data for locations from Open-Meteo Archive API."""
 
 import json
+import statistics
 from datetime import date, timedelta
 import requests
 
@@ -60,8 +61,12 @@ def main():
         # Get values as list and calculate statistics
         rainfall_values = list(yearly_rainfall.values())
         current_rainfall = yearly_rainfall[2025]
-        average_rainfall = sum(rainfall_values) / len(rainfall_values)
+        average_rainfall = statistics.mean(rainfall_values)
+        std_deviation = statistics.stdev(rainfall_values)
         deviation = current_rainfall - average_rainfall
+        
+        # Calculate Z-Score (Simplified SPI)
+        z_score = (current_rainfall - average_rainfall) / std_deviation
         
         # Format location name nicely (replace underscores, title case)
         display_name = name.replace("_", " ").title()
@@ -70,6 +75,8 @@ def main():
         print(f"  5-Year Rainfall History: {rainfall_values}")
         print(f"  5-Year Average: {average_rainfall:.1f} mm")
         print(f"  Current Deviation from Average: {deviation:.1f} mm")
+        print(f"  Standard Deviation: {std_deviation:.1f}")
+        print(f"  Z-Score (SPI proxy): {z_score:.2f}")
 
 
 if __name__ == "__main__":
