@@ -77,10 +77,16 @@ def main():
         avg_max_temp = statistics.mean(valid_temps) if valid_temps else 0
         days_above_32 = sum(1 for t in valid_temps if t > 32.0)
         
+        # Determine heat stress status
+        if days_above_32 >= 7:
+            heat_status = "⚠️ CRITICAL HEAT ALERT"
+        else:
+            heat_status = "✅ Normal"
+        
         # Format location name nicely (replace underscores, title case)
         display_name = name.replace("_", " ").title()
         
-        print(f"{display_name} 5-Year Analysis:")
+        print(f"{display_name} 5-Year Analysis: {heat_status}")
         print(f"  5-Year Rainfall History: {rainfall_values}")
         print(f"  5-Year Average: {average_rainfall:.1f} mm")
         print(f"  Current Deviation from Average: {deviation:.1f} mm")
