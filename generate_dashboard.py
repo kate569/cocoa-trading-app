@@ -10,6 +10,8 @@ from fetch_enso import get_enso_signal
 from fetch_market import get_market_data
 from check_fundamentals import get_fundamentals_analysis
 from fetch_technicals import get_technical_analysis
+from market_narrative import generate_market_narrative
+from plot_chart import generate_chart
 
 
 def calculate_verdict(weather, enso, fundamentals):
@@ -64,6 +66,10 @@ def generate_html():
     """Generate the HTML dashboard."""
     print("Fetching data from all sources...")
     
+    # Generate price chart
+    print("Generating price chart...")
+    generate_chart("docs/chart.png")
+    
     # Fetch all data
     weather = analyze_weather()
     enso = get_enso_signal()
@@ -75,6 +81,10 @@ def generate_html():
     verdict, verdict_class, description, multiplier, active_signals = calculate_verdict(
         weather, enso, fundamentals
     )
+    
+    # Generate market narrative
+    news_sentiment = fundamentals.get("news_sentiment", "NEUTRAL")
+    narrative = generate_market_narrative(tech_data, fundamentals, weather, news_sentiment)
     
     # Format market change
     if market["change_pct"] is not None:
@@ -92,6 +102,18 @@ def generate_html():
     else:
         tech_signal_class = "neutral"
         rsi_class = "neutral"
+    
+    # Format news sentiment
+    news_sentiment = fundamentals.get("news_sentiment", "NEUTRAL")
+    if "DEFICIT" in news_sentiment or news_sentiment == "BULLISH":
+        news_sentiment_class = "negative"  # Red = supply concern = bullish for prices
+        news_sentiment_display = f"🔴 {news_sentiment}"
+    elif "SURPLUS" in news_sentiment or news_sentiment == "BEARISH":
+        news_sentiment_class = "positive"  # Green = supply comfort = bearish for prices
+        news_sentiment_display = f"🟢 {news_sentiment}"
+    else:
+        news_sentiment_class = "neutral"
+        news_sentiment_display = f"⚪ {news_sentiment}"
     
     # Build weather cards HTML
     weather_cards = ""
@@ -366,6 +388,61 @@ def generate_html():
             line-height: 1.6;
         }}
         
+        .narrative-section {{
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: left;
+        }}
+        
+        .narrative-section h4 {{
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }}
+        
+        .narrative-text {{
+            color: #e0e0e0;
+            font-size: 0.95em;
+            line-height: 1.8;
+        }}
+        
+        .narrative-text .driver {{
+            color: #fff;
+            margin-bottom: 10px;
+        }}
+        
+        .narrative-text .chart {{
+            color: #ccc;
+            margin-bottom: 10px;
+        }}
+        
+        .narrative-text .context {{
+            color: #ff8800;
+        }}
+        
+        .chart-section {{
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }}
+        
+        .chart-section h3 {{
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }}
+        
+        .chart-section img {{
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }}
+        
         .signals-container {{
             margin-top: 20px;
             display: flex;
@@ -458,6 +535,10 @@ def generate_html():
                     <span>{fundamentals['status_display']}</span>
                 </div>
                 <div class="metric">
+                    <span class="label">News Sentiment</span>
+                    <span class="{news_sentiment_class}">{news_sentiment_display}</span>
+                </div>
+                <div class="metric">
                     <span class="label">Position Multiplier</span>
                     <span class="positive">{fundamentals['multiplier']}x</span>
                 </div>
@@ -488,22 +569,36 @@ def generate_html():
             </div>
         </div>
         
+        <!-- Price Chart Section -->
+        <div class="chart-section">
+            <h3>📊 ICE COCOA FUTURES - 6 MONTH CHART (with SMA-50)</h3>
+            <img src="docs/chart.png" alt="Cocoa Futures Chart with SMA-50" />
+        </div>
+        
         <!-- Verdict Banner -->
         <div class="verdict-banner {verdict_class}">
             <h2>{verdict}</h2>
             <div class="description">{description}</div>
             
+            <div class="narrative-section">
+                <h4>📝 MARKET ANALYSIS</h4>
+                <div class="narrative-text">
+                    <p class="driver">🎯 <strong>The Driver:</strong> {narrative['driver']}</p>
+                    <p class="chart">📊 <strong>The Chart:</strong> {narrative['chart']}</p>
+                    <p class="context">🌦️ <strong>The Context:</strong> {narrative['context']}</p>
+                </div>
+            </div>
+            
             <div class="strategy-section">
                 <div class="strategy-box">
                     <h4>🎯 STRATEGY (Fundamental)</h4>
                     <p>Risk Appetite: {verdict}<br>
-                    Position Size: {multiplier}x Standard Lots<br>
-                    Based on: Weather, Climate, Supply fundamentals</p>
+                    Position Size: {multiplier}x Standard Lots</p>
                 </div>
                 <div class="strategy-box">
                     <h4>⚡ TACTICS (Technical)</h4>
                     <p>Signal: {tech_data['signal']}<br>
-                    {tech_data['explanation']}</p>
+                    Trend: {tech_data['trend']} | RSI: {tech_data['rsi']:.0f}</p>
                 </div>
             </div>
             

@@ -1,1 +1,4 @@
-{"global_stocks_to_usage_ratio": 29.5}
+{
+  "global_stocks_to_usage_ratio": 29.5,
+  "news_sentiment_status": "NEUTRAL"
+}

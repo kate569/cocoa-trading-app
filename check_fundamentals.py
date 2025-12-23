@@ -38,10 +38,12 @@ def get_fundamentals_analysis():
     Get full fundamentals analysis including ratio, multiplier, and status.
     
     Returns:
-        dict: {"stocks_ratio": float, "multiplier": float, "status": str, "status_display": str}
+        dict: {"stocks_ratio": float, "multiplier": float, "status": str, 
+               "status_display": str, "news_sentiment": str}
     """
     fundamentals = load_fundamentals()
     stocks_ratio = fundamentals["global_stocks_to_usage_ratio"]
+    news_sentiment = fundamentals.get("news_sentiment_status", "NEUTRAL")
     multiplier, status_display = calculate_position_multiplier(stocks_ratio)
     
     if multiplier == 2.5:
@@ -55,7 +57,8 @@ def get_fundamentals_analysis():
         "stocks_ratio": stocks_ratio,
         "multiplier": multiplier,
         "status": status,
-        "status_display": status_display
+        "status_display": status_display,
+        "news_sentiment": news_sentiment
     }
 
 
