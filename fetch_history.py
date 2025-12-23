@@ -40,32 +40,36 @@ def main():
     end_date_current = date.today() - timedelta(days=1)  # Yesterday (most recent complete day)
     start_date_current = end_date_current - timedelta(days=29)   # 30 days total
     
-    # Calculate same 30-day window from previous year
-    end_date_previous = end_date_current.replace(year=end_date_current.year - 1)
-    start_date_previous = start_date_current.replace(year=start_date_current.year - 1)
+    # Years to fetch for 5-year baseline
+    years = [2021, 2022, 2023, 2024, 2025]
     
     for name, coords in locations.items():
         lat = coords["lat"]
         lon = coords["lon"]
         
-        # Fetch current year data
-        weather_current = fetch_historical_weather(lat, lon, start_date_current, end_date_current)
-        total_current = calculate_total_rainfall(weather_current)
+        # Fetch rainfall for each year in the 5-year window
+        yearly_rainfall = {}
+        for year in years:
+            start_date = start_date_current.replace(year=year)
+            end_date = end_date_current.replace(year=year)
+            
+            weather = fetch_historical_weather(lat, lon, start_date, end_date)
+            total = calculate_total_rainfall(weather)
+            yearly_rainfall[year] = total
         
-        # Fetch previous year data
-        weather_previous = fetch_historical_weather(lat, lon, start_date_previous, end_date_previous)
-        total_previous = calculate_total_rainfall(weather_previous)
-        
-        # Calculate difference
-        difference = total_current - total_previous
+        # Get values as list and calculate statistics
+        rainfall_values = list(yearly_rainfall.values())
+        current_rainfall = yearly_rainfall[2025]
+        average_rainfall = sum(rainfall_values) / len(rainfall_values)
+        deviation = current_rainfall - average_rainfall
         
         # Format location name nicely (replace underscores, title case)
         display_name = name.replace("_", " ").title()
         
-        print(f"{display_name} Year-over-Year Comparison:")
-        print(f"  Current 30-Day Sum: {total_current} mm")
-        print(f"  Previous Year 30-Day Sum: {total_previous} mm")
-        print(f"  Difference: {difference} mm")
+        print(f"{display_name} 5-Year Analysis:")
+        print(f"  5-Year Rainfall History: {rainfall_values}")
+        print(f"  5-Year Average: {average_rainfall:.1f} mm")
+        print(f"  Current Deviation from Average: {deviation:.1f} mm")
 
 
 if __name__ == "__main__":
