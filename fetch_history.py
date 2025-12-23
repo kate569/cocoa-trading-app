@@ -23,7 +23,7 @@ def fetch_historical_weather(lat, lon, start_date, end_date):
         "end_date": end_date.isoformat(),
         "daily": "precipitation_sum,temperature_2m_max,wind_speed_10m_max,relative_humidity_2m_mean"
     }
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, timeout=60)
     response.raise_for_status()
     return response.json()
 
