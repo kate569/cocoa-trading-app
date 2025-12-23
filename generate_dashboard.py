@@ -9,6 +9,7 @@ from fetch_history import analyze_weather
 from fetch_enso import get_enso_signal
 from fetch_market import get_market_data
 from check_fundamentals import get_fundamentals_analysis
+from fetch_technicals import get_technical_analysis
 
 
 def calculate_verdict(weather, enso, fundamentals):
@@ -68,6 +69,7 @@ def generate_html():
     enso = get_enso_signal()
     market = get_market_data()
     fundamentals = get_fundamentals_analysis()
+    tech_data = get_technical_analysis()
     
     # Calculate verdict
     verdict, verdict_class, description, multiplier, active_signals = calculate_verdict(
@@ -82,6 +84,14 @@ def generate_html():
     else:
         change_class = "neutral"
         change_display = "N/A"
+    
+    # Format technical data
+    if tech_data["price"]:
+        tech_signal_class = "positive" if tech_data["signal"] == "BUY" else ("negative" if tech_data["signal"] == "SELL" else "neutral")
+        rsi_class = "alert" if tech_data["rsi_status"] == "Overbought" else ("positive" if tech_data["rsi_status"] == "Oversold" else "neutral")
+    else:
+        tech_signal_class = "neutral"
+        rsi_class = "neutral"
     
     # Build weather cards HTML
     weather_cards = ""
@@ -127,7 +137,7 @@ def generate_html():
             icon = "🔴" if signal_type == "BEARISH" else "🟢"
             signals_html += f'<div class="signal">{icon} {signal_name}</div>'
     else:
-        signals_html = '<div class="signal neutral">No active signals</div>'
+        signals_html = '<div class="signal neutral">No active fundamental signals</div>'
     
     # Generate timestamp
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -155,7 +165,7 @@ def generate_html():
         }}
         
         .container {{
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }}
         
@@ -186,7 +196,7 @@ def generate_html():
         
         .grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }}
@@ -205,7 +215,7 @@ def generate_html():
         }}
         
         .card h3 {{
-            font-size: 1.3em;
+            font-size: 1.2em;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid #333;
@@ -230,6 +240,15 @@ def generate_html():
             font-size: 2em;
             font-weight: bold;
             text-shadow: 0 0 10px #00ff88;
+        }}
+        
+        .tech-signal {{
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
         }}
         
         .positive {{
@@ -322,6 +341,31 @@ def generate_html():
             color: #00ff88;
         }}
         
+        .strategy-section {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 25px 0;
+            text-align: left;
+        }}
+        
+        .strategy-box {{
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+        }}
+        
+        .strategy-box h4 {{
+            color: #00ff88;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }}
+        
+        .strategy-box p {{
+            color: #ccc;
+            line-height: 1.6;
+        }}
+        
         .signals-container {{
             margin-top: 20px;
             display: flex;
@@ -342,6 +386,15 @@ def generate_html():
             padding: 30px;
             color: #444;
             font-size: 0.8em;
+        }}
+        
+        @media (max-width: 768px) {{
+            .strategy-section {{
+                grid-template-columns: 1fr;
+            }}
+            h1 {{
+                font-size: 2em;
+            }}
         }}
     </style>
 </head>
@@ -368,6 +421,28 @@ def generate_html():
                 <div class="metric">
                     <span class="label">Previous Close</span>
                     <span>${market['previous_close']:,.2f}</span>
+                </div>
+            </div>
+            
+            <!-- Technical Analysis Card -->
+            <div class="card">
+                <h3>📈 TECHNICALS</h3>
+                <div class="tech-signal {tech_signal_class}">{tech_data['signal']}</div>
+                <div class="metric">
+                    <span class="label">SMA (50)</span>
+                    <span>${tech_data['sma']:,.2f}</span>
+                </div>
+                <div class="metric">
+                    <span class="label">RSI (14)</span>
+                    <span class="{rsi_class}">{tech_data['rsi']:.1f}</span>
+                </div>
+                <div class="metric">
+                    <span class="label">Trend</span>
+                    <span>{tech_data['trend_display']}</span>
+                </div>
+                <div class="metric">
+                    <span class="label">RSI Status</span>
+                    <span class="{rsi_class}">{tech_data['rsi_display']}</span>
                 </div>
             </div>
             
@@ -417,6 +492,21 @@ def generate_html():
         <div class="verdict-banner {verdict_class}">
             <h2>{verdict}</h2>
             <div class="description">{description}</div>
+            
+            <div class="strategy-section">
+                <div class="strategy-box">
+                    <h4>🎯 STRATEGY (Fundamental)</h4>
+                    <p>Risk Appetite: {verdict}<br>
+                    Position Size: {multiplier}x Standard Lots<br>
+                    Based on: Weather, Climate, Supply fundamentals</p>
+                </div>
+                <div class="strategy-box">
+                    <h4>⚡ TACTICS (Technical)</h4>
+                    <p>Signal: {tech_data['signal']}<br>
+                    {tech_data['explanation']}</p>
+                </div>
+            </div>
+            
             <div class="multiplier">Recommended Position Size: {multiplier}x Standard Lots</div>
             <div class="signals-container">
                 {signals_html}
