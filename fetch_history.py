@@ -77,6 +77,7 @@ def main():
         print(f"  Current Deviation from Average: {deviation:.1f} mm")
         print(f"  Standard Deviation: {std_deviation:.1f}")
         print(f"  Z-Score (SPI proxy): {z_score:.2f}")
+        print()  # Blank line between locations
 
 
 if __name__ == "__main__":
