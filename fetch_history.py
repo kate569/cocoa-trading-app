@@ -12,14 +12,14 @@ def load_locations(filepath="locations.json"):
         return json.load(f)
 
 
-def fetch_historical_weather(lat, lon, target_date):
+def fetch_historical_weather(lat, lon, start_date, end_date):
     """Fetch historical precipitation from Open-Meteo Archive API."""
     url = "https://archive-api.open-meteo.com/v1/archive"
     params = {
         "latitude": lat,
         "longitude": lon,
-        "start_date": target_date.isoformat(),
-        "end_date": target_date.isoformat(),
+        "start_date": start_date.isoformat(),
+        "end_date": end_date.isoformat(),
         "daily": "precipitation_sum"
     }
     response = requests.get(url, params=params)
@@ -30,23 +30,25 @@ def fetch_historical_weather(lat, lon, target_date):
 def main():
     locations = load_locations()
     
-    # Calculate date 7 days ago
-    target_date = date.today() - timedelta(days=7)
+    # Calculate date range for last 30 days
+    end_date = date.today() - timedelta(days=1)  # Yesterday (most recent complete day)
+    start_date = end_date - timedelta(days=29)   # 30 days total
     
     for name, coords in locations.items():
         lat = coords["lat"]
         lon = coords["lon"]
         
-        weather = fetch_historical_weather(lat, lon, target_date)
+        weather = fetch_historical_weather(lat, lon, start_date, end_date)
         daily = weather["daily"]
         
-        rainfall = daily["precipitation_sum"][0]
-        date_str = daily["time"][0]
+        # Calculate total rainfall, handling None values
+        precipitation_values = daily["precipitation_sum"]
+        total_rainfall = sum(v for v in precipitation_values if v is not None)
         
         # Format location name nicely (replace underscores, title case)
         display_name = name.replace("_", " ").title()
         
-        print(f"{display_name} Rainfall on {date_str}: {rainfall} mm")
+        print(f"{display_name} Total Rainfall (Last 30 Days): {total_rainfall} mm")
 
 
 if __name__ == "__main__":
