@@ -84,7 +84,7 @@ def generate_html():
     
     # Generate market narrative
     news_sentiment = fundamentals.get("news_sentiment", "NEUTRAL")
-    narrative = generate_market_narrative(tech_data, fundamentals, weather, news_sentiment)
+    narrative = generate_market_narrative(tech_data, fundamentals, weather, news_sentiment, enso)
     
     # Format market change
     if market["change_pct"] is not None:
@@ -406,20 +406,84 @@ def generate_html():
             color: #e0e0e0;
             font-size: 0.95em;
             line-height: 1.8;
+            white-space: pre-wrap;
         }}
         
-        .narrative-text .driver {{
+        .narrative-paragraph {{
+            color: #ddd;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #222;
+            border-radius: 5px;
+            border-left: 3px solid #00ff88;
+        }}
+        
+        .holding-time-box {{
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border: 2px solid #00aaff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }}
+        
+        .holding-time-box h4 {{
+            color: #00aaff;
+            margin-bottom: 10px;
+        }}
+        
+        .holding-time-box .duration {{
+            font-size: 2em;
             color: #fff;
-            margin-bottom: 10px;
+            font-weight: bold;
         }}
         
-        .narrative-text .chart {{
-            color: #ccc;
-            margin-bottom: 10px;
+        .holding-time-box .exit-condition {{
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 10px;
         }}
         
-        .narrative-text .context {{
+        .why-signal-box {{
+            background: #1a1a1a;
+            border: 1px solid #ff8800;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }}
+        
+        .why-signal-box h4 {{
             color: #ff8800;
+            margin-bottom: 15px;
+        }}
+        
+        .why-signal-box .content {{
+            color: #ccc;
+            font-size: 0.9em;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }}
+        
+        .correlated-warning {{
+            background: linear-gradient(135deg, #2a1a1a 0%, #3a2020 100%);
+            border: 2px solid #ff4444;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }}
+        
+        .correlated-warning h4 {{
+            color: #ff4444;
+            margin-bottom: 10px;
+        }}
+        
+        .correlated-warning .content {{
+            color: #ffaaaa;
+            font-size: 0.9em;
+            line-height: 1.7;
+            white-space: pre-wrap;
         }}
         
         .chart-section {{
@@ -581,13 +645,36 @@ def generate_html():
             <div class="description">{description}</div>
             
             <div class="narrative-section">
-                <h4>📝 MARKET ANALYSIS</h4>
+                <h4>📝 DETAILED MARKET ANALYSIS</h4>
                 <div class="narrative-text">
-                    <p class="driver">🎯 <strong>The Driver:</strong> {narrative['driver']}</p>
-                    <p class="chart">📊 <strong>The Chart:</strong> {narrative['chart']}</p>
-                    <p class="context">🌦️ <strong>The Context:</strong> {narrative['context']}</p>
+                    <div class="narrative-paragraph">
+                        🎯 <strong>Fundamental Backdrop:</strong><br>{narrative['fundamental_paragraph']}
+                    </div>
+                    <div class="narrative-paragraph">
+                        📊 <strong>Technical Positioning:</strong><br>{narrative['technical_paragraph']}
+                    </div>
+                    <div class="narrative-paragraph">
+                        🌦️ <strong>Weather & Risk Context:</strong><br>{narrative['weather_paragraph']}
+                    </div>
                 </div>
             </div>
+            
+            <!-- Holding Time Box -->
+            <div class="holding-time-box">
+                <h4>🕒 ESTIMATED HOLDING TIME</h4>
+                <div class="duration">{narrative['holding_time']['primary_duration']}</div>
+                <div class="exit-condition">
+                    {narrative['holding_time'].get('primary_exit', 'No specific exit trigger - monitor conditions')}
+                </div>
+            </div>
+            
+            <!-- Why This Signal Box -->
+            <div class="why-signal-box">
+                <h4>💡 WHY THIS SIGNAL?</h4>
+                <div class="content">{narrative['amplifier_explanation']}</div>
+            </div>
+            
+            {f'<div class="correlated-warning"><h4>🚨 CORRELATED RISK WARNING</h4><div class="content">{narrative["correlated_warning"]}</div></div>' if narrative.get('correlated_warning') else ''}
             
             <div class="strategy-section">
                 <div class="strategy-box">
