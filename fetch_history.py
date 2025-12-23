@@ -34,22 +34,33 @@ def calculate_total_rainfall(weather_data):
     return sum(v for v in precipitation_values if v is not None)
 
 
-def main():
+def analyze_weather():
+    """
+    Analyze weather data for all locations.
+    
+    Returns:
+        dict: Analysis results containing status for each region and alerts.
+    """
     locations = load_locations()
     
     # Calculate date range for last 30 days (current year)
-    end_date_current = date.today() - timedelta(days=1)  # Yesterday (most recent complete day)
-    start_date_current = end_date_current - timedelta(days=29)   # 30 days total
+    end_date_current = date.today() - timedelta(days=1)
+    start_date_current = end_date_current - timedelta(days=29)
     
     # Years to fetch for 5-year baseline
     years = [2021, 2022, 2023, 2024, 2025]
     
-    # Track regions with severe drought
-    severe_drought_regions = []
+    # Results dictionary
+    results = {
+        "regions": {},
+        "severe_drought_regions": [],
+        "dual_region_drought_detected": False
+    }
     
     for name, coords in locations.items():
         lat = coords["lat"]
         lon = coords["lon"]
+        display_name = name.replace("_", " ").title()
         
         # Fetch rainfall for each year in the 5-year window
         yearly_rainfall = {}
@@ -73,12 +84,15 @@ def main():
         
         # Determine drought status based on Z-Score
         if z_score < -1.5:
-            drought_status = "🔴 SEVERE DROUGHT ALERT"
-            severe_drought_regions.append(name.replace("_", " ").title())
+            drought_status = "Severe Drought"
+            drought_status_display = "🔴 SEVERE DROUGHT ALERT"
+            results["severe_drought_regions"].append(display_name)
         elif z_score < -1.0:
-            drought_status = "🟠 DRY WARNING"
+            drought_status = "Dry Warning"
+            drought_status_display = "🟠 DRY WARNING"
         else:
-            drought_status = "💧 Moisture OK"
+            drought_status = "Normal"
+            drought_status_display = "💧 Moisture OK"
         
         # Fetch current period weather for temperature analysis
         current_weather = fetch_historical_weather(lat, lon, start_date_current, end_date_current)
@@ -91,9 +105,11 @@ def main():
         
         # Determine heat stress status
         if days_above_32 >= 7:
-            heat_status = "⚠️ CRITICAL HEAT ALERT"
+            heat_status = "Critical Heat"
+            heat_status_display = "⚠️ CRITICAL HEAT ALERT"
         else:
-            heat_status = "✅ Normal"
+            heat_status = "Normal"
+            heat_status_display = "✅ Normal"
         
         # Calculate wind and humidity statistics for Harmattan detection
         wind_values = current_weather["daily"]["wind_speed_10m_max"]
@@ -107,32 +123,67 @@ def main():
         
         # Harmattan check: 25 knots ≈ 46 km/h, low humidity < 40%
         if avg_wind_speed > 46 and avg_humidity < 40:
-            harmattan_status = "🌪️ HARMATTAN ALERT"
+            harmattan_status = "Harmattan Active"
+            harmattan_status_display = "🌪️ HARMATTAN ALERT"
         else:
-            harmattan_status = "🍃 Wind Normal"
+            harmattan_status = "Normal"
+            harmattan_status_display = "🍃 Wind Normal"
         
-        # Format location name nicely (replace underscores, title case)
-        display_name = name.replace("_", " ").title()
-        
-        print(f"{display_name} 5-Year Analysis: {heat_status}")
-        print(f"  5-Year Rainfall History: {rainfall_values}")
-        print(f"  5-Year Average: {average_rainfall:.1f} mm")
-        print(f"  Current Deviation from Average: {deviation:.1f} mm")
-        print(f"  Standard Deviation: {std_deviation:.1f}")
-        print(f"  Z-Score (SPI proxy): {z_score:.2f}")
-        print(f"  Drought Status: {drought_status}")
-        print(f"  Avg Max Temp: {avg_max_temp:.1f} °C")
-        print(f"  Days > 32°C: {days_above_32}")
-        print(f"  Avg Wind Speed: {avg_wind_speed:.1f} km/h")
-        print(f"  Avg Humidity: {avg_humidity:.1f}%")
-        print(f"  Harmattan Status: {harmattan_status}")
-        print()  # Blank line between locations
+        # Store region data
+        results["regions"][display_name] = {
+            "drought_status": drought_status,
+            "drought_status_display": drought_status_display,
+            "heat_status": heat_status,
+            "heat_status_display": heat_status_display,
+            "harmattan_status": harmattan_status,
+            "harmattan_status_display": harmattan_status_display,
+            "z_score": z_score,
+            "rainfall_values": rainfall_values,
+            "average_rainfall": average_rainfall,
+            "current_rainfall": current_rainfall,
+            "deviation": deviation,
+            "std_deviation": std_deviation,
+            "avg_max_temp": avg_max_temp,
+            "days_above_32": days_above_32,
+            "avg_wind_speed": avg_wind_speed,
+            "avg_humidity": avg_humidity
+        }
+    
+    # Check for dual-region drought
+    results["dual_region_drought_detected"] = len(results["severe_drought_regions"]) >= 2
+    
+    return results
+
+
+def print_analysis(results):
+    """Print analysis results to console."""
+    for region_name, data in results["regions"].items():
+        print(f"{region_name} 5-Year Analysis: {data['heat_status_display']}")
+        print(f"  5-Year Rainfall History: {data['rainfall_values']}")
+        print(f"  5-Year Average: {data['average_rainfall']:.1f} mm")
+        print(f"  Current Deviation from Average: {data['deviation']:.1f} mm")
+        print(f"  Standard Deviation: {data['std_deviation']:.1f}")
+        print(f"  Z-Score (SPI proxy): {data['z_score']:.2f}")
+        print(f"  Drought Status: {data['drought_status_display']}")
+        print(f"  Avg Max Temp: {data['avg_max_temp']:.1f} °C")
+        print(f"  Days > 32°C: {data['days_above_32']}")
+        print(f"  Avg Wind Speed: {data['avg_wind_speed']:.1f} km/h")
+        print(f"  Avg Humidity: {data['avg_humidity']:.1f}%")
+        print(f"  Harmattan Status: {data['harmattan_status_display']}")
+        print()
     
     # Dual-region drought check
-    if len(severe_drought_regions) >= 2:
+    if results["dual_region_drought_detected"]:
         print("🚨🚨🚨 MARKET ALERT: DUAL-REGION SUPPLY SHOCK DETECTED! (High Conviction Buy)")
     else:
         print("No dual-region drought currently detected.")
+
+
+def main():
+    """Main function to run weather analysis."""
+    results = analyze_weather()
+    print_analysis(results)
+    return results
 
 
 if __name__ == "__main__":
