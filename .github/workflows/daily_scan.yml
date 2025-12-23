@@ -1,0 +1,30 @@
+name: Daily Cocoa Trading Scan
+
+on:
+  # Manual trigger button
+  workflow_dispatch:
+  
+  # Scheduled run at 8 AM UTC daily
+  schedule:
+    - cron: '0 8 * * *'
+
+jobs:
+  run-trading-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run Trading Dashboard
+        run: python main.py
