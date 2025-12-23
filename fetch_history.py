@@ -44,6 +44,9 @@ def main():
     # Years to fetch for 5-year baseline
     years = [2021, 2022, 2023, 2024, 2025]
     
+    # Track regions with severe drought
+    severe_drought_regions = []
+    
     for name, coords in locations.items():
         lat = coords["lat"]
         lon = coords["lon"]
@@ -71,6 +74,7 @@ def main():
         # Determine drought status based on Z-Score
         if z_score < -1.5:
             drought_status = "🔴 SEVERE DROUGHT ALERT"
+            severe_drought_regions.append(name.replace("_", " ").title())
         elif z_score < -1.0:
             drought_status = "🟠 DRY WARNING"
         else:
@@ -104,6 +108,12 @@ def main():
         print(f"  Avg Max Temp: {avg_max_temp:.1f} °C")
         print(f"  Days > 32°C: {days_above_32}")
         print()  # Blank line between locations
+    
+    # Dual-region drought check
+    if len(severe_drought_regions) >= 2:
+        print("🚨🚨🚨 MARKET ALERT: DUAL-REGION SUPPLY SHOCK DETECTED! (High Conviction Buy)")
+    else:
+        print("No dual-region drought currently detected.")
 
 
 if __name__ == "__main__":
