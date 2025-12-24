@@ -76,15 +76,24 @@ def get_technical_analysis():
             "price": None,
             "rsi": None,
             "sma": None,
+            "volume": 0,
             "signal": "UNKNOWN",
             "trend": "Unknown",
             "rsi_status": "Unknown",
             "explanation": "Insufficient data for analysis"
         }
     
-    # Get closing prices
+    # Get closing prices and volume
     closes = hist["Close"]
+    volumes = hist["Volume"]
     current_price = closes.iloc[-1]
+    
+    # Get latest volume (handle NaN)
+    latest_volume = volumes.iloc[-1]
+    if pd.isna(latest_volume):
+        latest_volume = 0
+    else:
+        latest_volume = int(latest_volume)
     
     # Calculate indicators
     sma_50 = calculate_sma(closes, period=50)
@@ -135,6 +144,7 @@ def get_technical_analysis():
         "price": float(current_price),
         "rsi": float(rsi_14),
         "sma": float(sma_50),
+        "volume": latest_volume,
         "signal": signal,
         "trend": trend,
         "rsi_status": rsi_status,

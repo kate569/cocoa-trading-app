@@ -563,6 +563,14 @@ def generate_html():
                     <span class="label">Previous Close</span>
                     <span>${market['previous_close']:,.2f}</span>
                 </div>
+                <div class="metric">
+                    <span class="label">Volume</span>
+                    <span>{tech_data['volume']:,}</span>
+                </div>
+                <div class="metric">
+                    <span class="label">Est. Turnover</span>
+                    <span>${(tech_data['volume'] * market['price'] * 10) / 1000000:,.1f}M</span>
+                </div>
             </div>
             
             <!-- Technical Analysis Card -->
