@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
 Technical Analysis for Cocoa Futures.
-Calculates SMA_50 and RSI_14 indicators.
+Calculates SMA_50, RSI_14, and ATR_14 indicators.
 """
 
 import yfinance as yf
 import pandas as pd
+import pandas_ta as ta
 
 
 def calculate_rsi(prices, period=14):
@@ -76,6 +77,7 @@ def get_technical_analysis():
             "price": None,
             "rsi": None,
             "sma": None,
+            "atr": 0,
             "volume": 0,
             "signal": "UNKNOWN",
             "trend": "Unknown",
@@ -98,6 +100,12 @@ def get_technical_analysis():
     # Calculate indicators
     sma_50 = calculate_sma(closes, period=50)
     rsi_14 = calculate_rsi(closes, period=14)
+    
+    # Calculate ATR (Average True Range) using pandas_ta
+    atr_series = ta.atr(hist["High"], hist["Low"], hist["Close"], length=14)
+    latest_atr = atr_series.iloc[-1] if atr_series is not None and not atr_series.empty else 0
+    if pd.isna(latest_atr):
+        latest_atr = 0
     
     # Determine trend
     if current_price > sma_50:
@@ -144,6 +152,7 @@ def get_technical_analysis():
         "price": float(current_price),
         "rsi": float(rsi_14),
         "sma": float(sma_50),
+        "atr": round(latest_atr, 2),
         "volume": latest_volume,
         "signal": signal,
         "trend": trend,
